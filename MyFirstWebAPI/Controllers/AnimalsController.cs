@@ -12,16 +12,59 @@ namespace MyFirstWebAPI.Controllers
     [ApiController]
     public class AnimalsController : ControllerBase
     {
+        static List<Animal> _animals = new List<Animal>
+            {
+            new Animal {Id = 1, Name = "Steve", Type = "Elephant", Weight = 2000 },
+            new Animal {Id = 2, Name = "George", Type = "Monkey", Weight = 87 },
+            new Animal {Id = 3, Name = "Tony", Type = "Tiger", Weight = 1200 }
+            };
+
         [HttpGet]
         public IActionResult GetAllAnimals()
         {
-            var animals = new List<Animal>
+       
+            return Ok(_animals);
+        }
+        [HttpGet("{id}")]
+        public IActionResult GetSingleAnimal(int id)
+        {
+            var animalIWant = _animals.FirstOrDefault(a => a.Id == id);
+
+            if (animalIWant == null)
             {
-            new Animal {Name = "Steve", Type = "Elephant", Weight = 2000 },
-            new Animal {Name = "George", Type = "Monkey", Weight = 87 },
-            new Animal {Name = "Tony", Type = "Tiger", Weight = 1200 }
-            };
-            return Ok(animals);
+                return NotFound($"Animal with the Id of {id} was not found.");
+            }
+            else
+            {
+            return Ok(animalIWant);
+            }
+        }
+
+        // This needs to be a POST to /api/animals
+        [HttpPost]
+        public IActionResult AddAnAnimal(Animal animalToAdd)
+        {
+            _animals.Add(animalToAdd);
+            return Ok(_animals);
+        }
+
+        // PUT / api/animals/{id}
+        [HttpPut("{id}")]
+        public IActionResult UpdateAnAnimal(int id, Animal animal)
+        {
+            var animalToUpdate = _animals.FirstOrDefault(a => a.Id == id);
+
+            if (animalToUpdate == null)
+            {
+                return NotFound("Can't update because it doesn't exist");
+            }
+            else
+            {
+                animalToUpdate.Name = animal.Name;
+                animalToUpdate.Weight = animal.Weight;
+                animalToUpdate.Type = animal.Type;
+                return Ok(animalToUpdate);
+            }
         }
     }
 }
